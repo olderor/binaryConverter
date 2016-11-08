@@ -61,6 +61,12 @@ namespace binaryConverter
                 List<bool> part = convert(c - '0', system);
                 digits.AddRange(part);
             }
+            while (digits.Count != 0 && !digits[digits.Count - 1])
+            {
+                digits.RemoveAt(digits.Count - 1);
+            }
+            if (digits.Count == 0)
+                digits.Add(false);
         }
 
         private void setFractional(double number, int precision)
@@ -78,7 +84,10 @@ namespace binaryConverter
                     fractionalDigits.Add(false);
                 }
             }
-            fractionalDigits.Reverse();
+            while (fractionalDigits.Count != 0 && !fractionalDigits[fractionalDigits.Count - 1])
+            {
+                fractionalDigits.RemoveAt(fractionalDigits.Count - 1);
+            }
             checkZero();
         }
 
@@ -160,7 +169,7 @@ namespace binaryConverter
             if (fractionalDigits.Count == 0) return result;
 
             result += ".";
-            for (int i = fractionalDigits.Count - 1; i >= 0; --i)
+            for (int i = 0; i < fractionalDigits.Count; ++i)
             {
                 result += fractionalDigits[i] ? '1' : '0';
             }
