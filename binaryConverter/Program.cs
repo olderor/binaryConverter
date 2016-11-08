@@ -11,45 +11,14 @@ namespace binaryConverter
         static void Main(string[] args)
         {
             Console.WriteLine("integers:");
-            Number n = new Number(12, 10);
+
+            Number n = new Number("123", NumeralSystem.Decimal);
             Console.WriteLine(n);
-
-            n = new Number(12, 2);
+            n = new Number("0.12", NumeralSystem.Octal, 10);
             Console.WriteLine(n);
-
-            n = new Number(15, 16);
+            n = new Number("123.125", NumeralSystem.Hexadecimal, 10);
             Console.WriteLine(n);
-
-            n = new Number(10, 16);
-            Console.WriteLine(n);
-
-            n = new Number(17, 16);
-            Console.WriteLine(n);
-
-
-            Console.WriteLine("doubles:");
-            n = new Number(12.23, 10, 2);
-            Console.WriteLine(n);
-
-            n = new Number(12.23, 10, 1);
-            Console.WriteLine(n);
-
-            n = new Number(12.23, 10, 0);
-            Console.WriteLine(n);
-
-            n = new Number(12.23, 10, 4);
-            Console.WriteLine(n);
-
-            n = new Number(12.23, 2, 15);
-            Console.WriteLine(n);
-
-            n = new Number(15.23, 16, 4);
-            Console.WriteLine(n);
-
-            n = new Number(10.23, 16, 4);
-            Console.WriteLine(n);
-
-            n = new Number(17.23, 16, 4);
+            n = new Number("1010", NumeralSystem.Binary);
             Console.WriteLine(n);
 
             Console.Read();
