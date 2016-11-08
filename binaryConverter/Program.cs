@@ -12,7 +12,11 @@ namespace binaryConverter
         {
             Console.WriteLine("integers:");
 
-            Number n = new Number("123.12", NumeralSystem.Decimal, 10);
+            Number n = new Number("-123.12", NumeralSystem.Decimal, 10);
+            Console.WriteLine(n);
+            Number n2 = new Number("123.12", NumeralSystem.Decimal, 10);
+            Console.WriteLine(n2);
+            n.Add(n2);
             Console.WriteLine(n);
             n = new Number("0.12", NumeralSystem.Octal, 10);
             Console.WriteLine(n);

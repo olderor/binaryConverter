@@ -22,6 +22,13 @@ namespace binaryConverter
             string integerPart = "";
             double fractionalPart = 0;
             int i = 0;
+
+            if (number[0] == '-')
+            {
+                ++i;
+                negative = true;
+            }
+
             for (; i < number.Length; ++i)
             {
                 if (number[i] == '.') break;
@@ -47,6 +54,14 @@ namespace binaryConverter
 
             setInteger(integerPart, system);
             setFractional(fractionalPart, precision);
+
+            if (negative)
+            {
+                Invert();
+                Inc();
+                removeLeadingZeros(ref digits);
+                removeLeadingZeros(ref fractionalDigits);
+            }
         }
 
         private void setInteger(string number, NumeralSystem system)
@@ -61,10 +76,7 @@ namespace binaryConverter
                 List<bool> part = convert(c - '0', system);
                 digits.AddRange(part);
             }
-            while (digits.Count != 0 && !digits[digits.Count - 1])
-            {
-                digits.RemoveAt(digits.Count - 1);
-            }
+            removeLeadingZeros(ref digits);
             if (digits.Count == 0)
                 digits.Add(false);
         }
@@ -84,10 +96,7 @@ namespace binaryConverter
                     fractionalDigits.Add(false);
                 }
             }
-            while (fractionalDigits.Count != 0 && !fractionalDigits[fractionalDigits.Count - 1])
-            {
-                fractionalDigits.RemoveAt(fractionalDigits.Count - 1);
-            }
+            removeLeadingZeros(ref fractionalDigits);
             checkZero();
         }
 
@@ -145,6 +154,103 @@ namespace binaryConverter
             return negative;
         }
 
+        public void Invert()
+        {
+            for (int i = 0; i < digits.Count; ++i)
+            {
+                digits[i] = !digits[i];
+            }
+            for (int i = 0; i < fractionalDigits.Count; ++i)
+            {
+                fractionalDigits[i] = !fractionalDigits[i];
+            }
+        }
+
+        public void Inc()
+        {
+            
+            string number = "";
+            if (fractionalDigits.Count == 0)
+                number = "1";
+            else
+            {
+                number = "0.";
+                for (int i = 0; i < fractionalDigits.Count - 1; ++i)
+                    number += "0";
+                number += "1";
+            }
+            Add(new Number(number, NumeralSystem.Binary, number.Length - 2));
+        }
+
+        public void Add(Number n)
+        {
+            int length1 = fractionalDigits.Count;
+            int length2 = n.fractionalDigits.Count;
+            int minLength = Math.Min(length1, length2);
+            int maxLength = length1 + length2 - minLength;
+
+            int i = 0;
+            for (i = length1; i <= maxLength + 1; ++i)
+                fractionalDigits.Add(false);
+
+            i = maxLength;
+            int rest = 0;
+            for (; i >= 0; --i)
+            {
+                rest += (fractionalDigits[i] ? 1 : 0);
+                if (i < length2) rest += (n.fractionalDigits[i] ? 1 : 0);
+
+                fractionalDigits[i] = rest % 2 == 1;
+                rest /= 2;
+            }
+            removeLeadingZeros(ref fractionalDigits);
+            addIntegerPart(n, rest);
+        }
+
+        private void addIntegerPart(Number n, int rest = 0)
+        {
+            int length1 = digits.Count;
+            int length2 = n.digits.Count;
+            int minLength = Math.Min(length1, length2);
+            int maxLength = length1 + length2 - minLength;
+
+            int i = 0;
+            for (i = length1; i <= maxLength + 1; ++i)
+                digits.Add(false);
+
+            i = 0;
+            for (; i < length2; ++i)
+            {
+                rest += (digits[i] ? 1 : 0) + (n.digits[i] ? 1 : 0);
+                digits[i] = rest % 2 == 1;
+                rest /= 2;
+            }
+            if (rest == 1 && negative)
+            {
+                negative = false;
+            }
+            else
+            {
+                while (rest != 0)
+                {
+                    rest += (digits[i] ? 1 : 0);
+                    digits[i] = rest % 2 == 1;
+                    rest /= 2;
+                    ++i;
+                }
+            }
+            removeLeadingZeros(ref digits);
+            if (digits.Count == 0)
+                digits.Add(false);
+        }
+
+        private void removeLeadingZeros(ref List<bool> list)
+        {
+            while (list.Count != 0 && !list[list.Count - 1])
+            {
+                list.RemoveAt(list.Count - 1);
+            }
+        }
 
         public static string digitToString(int digit, int numeralSystem)
         {
@@ -160,7 +266,7 @@ namespace binaryConverter
 
         public override string ToString()
         {
-            string result = "";
+            string result = negative ? "-" : "";
             for (int i = digits.Count - 1; i >= 0; --i)
             {
                 result += digits[i] ? '1' : '0';
