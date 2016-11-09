@@ -509,7 +509,7 @@ namespace binaryConverter
             {
                 n2.negative = false;
                 this.negative = false;
-                sub(this);
+                n2.sub(this);
                 Copy(n2);
                 return;
             }

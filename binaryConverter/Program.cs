@@ -41,16 +41,11 @@ namespace binaryConverter
             Console.WriteLine();
             Console.Write(n);
             Console.WriteLine(" (" + n.ConvertToDecimal() + ")");
-            Number n3 = -n;
-            Console.Write(n3);
-            Console.WriteLine(" (" + n3.ConvertToDecimal() + ")");
-            Number n4 = Number.Abs(n);
-            Console.Write(n4);
-            Console.WriteLine(" (" + n4.ConvertToDecimal() + ")");
-            Console.Write(-n4);
-            Console.WriteLine(" (" + (-n4).ConvertToDecimal() + ")");
-            Console.Write(-(-n4));
-            Console.WriteLine(" (" + (-(-n4)).ConvertToDecimal() + ")");
+            Number n3 = new Number(n);
+            n2 = n - n3 + n3 + n - n - n;
+            Console.Write(n2);
+            Console.WriteLine(" (" + n2.ConvertToDecimal() + ")");
+
             Console.Read();
 
         }
