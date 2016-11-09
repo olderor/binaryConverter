@@ -34,6 +34,7 @@ namespace binaryConverter
 
         public void Copy(Number n)
         {
+            maxPrecision = n.precision;
             digits = new List<bool>();
             fractionalDigits = new List<bool>();
             negative = n.negative;
@@ -49,6 +50,7 @@ namespace binaryConverter
 
         public Number(string number, NumeralSystem system, int precision = 0)
         {
+            maxPrecision = precision;
             string integerPart = "";
             double fractionalPart = 0;
             int i = 0;
@@ -83,7 +85,7 @@ namespace binaryConverter
             }
 
             setInteger(integerPart, system);
-            setFractional(fractionalPart, precision);
+            setFractional(fractionalPart);
 
             if (neg)
             {
@@ -116,9 +118,9 @@ namespace binaryConverter
                 digits.Add(false);
         }
 
-        private void setFractional(double number, int precision)
+        private void setFractional(double number)
         {
-            for (int i = 0; i < precision; ++i)
+            for (int i = 0; i < maxPrecision; ++i)
             {
                 number *= 2;
                 if (number >= 1)
@@ -464,6 +466,12 @@ namespace binaryConverter
             n.Mul(n2);
             return n;
         }
+        public static Number operator /(Number n1, Number n2)
+        {
+            Number n = new Number(n1);
+            n.Div(n2);
+            return n;
+        }
 
         public void Invert()
         {
@@ -553,6 +561,99 @@ namespace binaryConverter
             sub(n);
         }
 
+        public void Mul(Number n)
+        {
+            Number result = Number.Zero();
+            Number n1 = getFullNumber();
+            Number n2 = n.getFullNumber();
+
+            for (int i = 0; i < n2.digits.Count; ++i)
+            {
+                if (n2.digits[i])
+                {
+                    result += n1;
+                }
+                n1 <<= 1;
+            }
+            int toMove = fractionalDigits.Count + n.fractionalDigits.Count;
+            result >>= toMove;
+            removeLeadingZeros(ref result.digits);
+            removeLeadingZeros(ref result.fractionalDigits);
+
+            if (result.digits.Count == 0)
+            {
+                result.digits.Add(false);
+            }
+            if (negative != n.negative)
+            {
+                result.negative = true;
+            }
+            Copy(result);
+        }
+
+        public void Div(Number n)
+        {
+            if (n.isZero())
+            {
+                return;
+            }
+
+            Number result = Number.Zero();
+            result.digits = new List<bool>();
+            Number divident = new Number(this);
+            Number divisor = new Number(n);
+            divident.negative = false;
+            divisor.negative = false;
+
+            maxPrecision = Math.Max(maxPrecision, n.maxPrecision);
+            int difference = 0;
+            if (divident.digits.Count > divisor.digits.Count)
+            {
+                difference = divident.digits.Count - divisor.digits.Count;
+                divisor <<= difference;
+            }
+            for (int i = 0; difference > 0 || -difference <= maxPrecision; ++i)
+            {
+                if (divident < divisor)
+                {
+                    if (difference > -1)
+                    {
+                        result.digits.Insert(0, false);
+                    }
+                    else
+                    {
+                        result.fractionalDigits.Add(false);
+                    }
+                }
+                else
+                {
+                    if (difference > -1)
+                    {
+                        result.digits.Insert(0, true);
+                    }
+                    else
+                    {
+                        result.fractionalDigits.Add(true);
+                    }
+                    divident -= divisor;
+                }
+                divisor >>= 1;
+                removeLeadingZeros(ref divisor.fractionalDigits);
+                --difference;
+            }
+            removeLeadingZeros(ref result.digits);
+            removeLeadingZeros(ref result.fractionalDigits);
+            if (result.digits.Count == 0)
+            {
+                result.digits.Add(false);
+            }
+            if (negative != n.negative)
+            {
+                result.negative = true;
+            }
+
+            Copy(result);
+        }
 
         public void Floor(int digits = 0)
         {
@@ -583,32 +684,6 @@ namespace binaryConverter
         public void Abs()
         {
             negative = false;
-        }
-
-        public void Mul(Number n)
-        {
-            Number result = Number.Zero();
-            Number n1 = getFullNumber();
-            Number n2 = n.getFullNumber();
-
-            for (int i = 0; i < n2.digits.Count; ++i)
-            {
-                if (n2.digits[i])
-                {
-                    result += n1;
-                }
-                n1 <<= 1;
-            }
-            int toMove = fractionalDigits.Count + n.fractionalDigits.Count;
-            result >>= toMove;
-            removeLeadingZeros(ref result.digits);
-            removeLeadingZeros(ref result.fractionalDigits);
-
-            if (result.digits.Count == 0)
-            {
-                result.digits.Add(false);
-            }
-            Copy(result);
         }
 
         
@@ -838,6 +913,7 @@ namespace binaryConverter
                 return fractionalDigits.Count;
             }
         }
+        private int maxPrecision;
 
         private List<bool> digits = new List<bool>();
         private List<bool> fractionalDigits = new List<bool>();

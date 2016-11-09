@@ -55,15 +55,15 @@ namespace binaryConverter
 
 
 
-            n = new Number("12.3", NumeralSystem.Decimal, 10);
-            n2 = new Number("3.2", NumeralSystem.Decimal, 10);
+            n = new Number("127.74", NumeralSystem.Decimal, 2);
+            n2 = new Number("255.123412412", NumeralSystem.Decimal, 7);
             Console.Write(n);
             Console.Write(" (" + n.ConvertToDecimal() + ")");
-            Console.Write(" * ");
+            Console.Write(" / ");
             Console.Write(n2);
             Console.Write(" (" + n2.ConvertToDecimal() + ")");
             Console.Write(" = ");
-            n3 = n * n2;
+            n3 = n / n2;
             Console.Write(n3);
             Console.Write(" (" + n3.ConvertToDecimal() + ")");
             Console.Read();
