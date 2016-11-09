@@ -73,7 +73,7 @@ namespace binaryConverter
             for (int i = number.Length - 1; i >= 0; --i)
             {
                 char c = number[i];
-                List<bool> part = convert(c - '0', system);
+                List<bool> part = convertToBinary(c - '0', system);
                 digits.AddRange(part);
             }
             removeLeadingZeros(ref digits);
@@ -111,7 +111,89 @@ namespace binaryConverter
             return result;
         }
 
-        private List<bool> convert(int digit, NumeralSystem system)
+        public string ConvertToDecimal()
+        {
+            double number = 0;
+            double pow = 1;
+            for (int i = 0; i < digits.Count; ++i)
+            {
+                number += (digits[i] ? 1 : 0) * pow;
+                pow *= 2;
+            }
+            pow = 1;
+            for (int i = 0; i < fractionalDigits.Count; ++i)
+            {
+                pow /= 2;
+                number += (fractionalDigits[i] ? 1 : 0) * pow;
+            }
+            return number.ToString();
+        }
+
+        public string ConvertTo(NumeralSystem system)
+        {
+            string result = "";
+            
+            if (system == NumeralSystem.Binary) return ToString();
+
+            int partCount = system == NumeralSystem.Octal ? 3 : 4;
+
+            int digit = 0;
+            int pow = 1;
+            for (int i = 0; i < digits.Count; )
+            {
+                digit = 0;
+                pow = 1;
+                for (int j = 0; j < partCount; ++i, ++j)
+                {
+                    if (i < digits.Count)
+                    {
+                        digit += (digits[i] ? 1 : 0) * pow;
+                    }
+                    pow *= 2;
+                }
+                result = digitToChar(digit) + result;
+            }
+
+            if (fractionalDigits.Count == 0) return result;
+
+            result = result + ".";
+            digit = 0;
+            int maxPow = 1;
+            for (int i = 1; i < partCount; ++i)
+            {
+                maxPow *= 2;
+            }
+
+            for (int i = 0; i < fractionalDigits.Count;)
+            {
+                digit = 0;
+                pow = maxPow;
+                for (int j = 0; j < partCount && i < fractionalDigits.Count; ++i, ++j)
+                {
+                    digit += (fractionalDigits[i] ? 1 : 0) * pow;
+                    pow /= 2;
+                }
+                result = result + digitToChar(digit);
+            }
+            return result;
+        }
+
+        private char digitToChar(int digit)
+        {
+            char c;
+            if (digit < 10)
+            {
+                c = (char)digit;
+                c += '0';
+                return c;
+            }
+            digit -= 10;
+            c = (char)digit;
+            c += 'A';
+            return c;
+        }
+
+        private List<bool> convertToBinary(int digit, NumeralSystem system)
         {
             List<bool> result = new List<bool>();
             switch (system)
