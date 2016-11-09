@@ -17,6 +17,16 @@ namespace binaryConverter
 
     class Number
     {
+        public static Number Zero()
+        {
+            return new Number("0", NumeralSystem.Binary);
+        }
+
+        public static Number One()
+        {
+            return new Number("1", NumeralSystem.Binary);
+        }
+
         public Number(Number n)
         {
             Copy(n);
@@ -77,7 +87,7 @@ namespace binaryConverter
 
             if (negative)
             {
-                Number n2 = new Number("0", NumeralSystem.Binary);
+                Number n2 = Number.Zero();
                 n2.Sub(this);
                 Copy(n2);
             }
@@ -253,7 +263,7 @@ namespace binaryConverter
             c += 'A';
             return c;
         }
-        
+
         private List<bool> convertToBinary(int digit, NumeralSystem system)
         {
             List<bool> result = new List<bool>();
@@ -425,20 +435,13 @@ namespace binaryConverter
 
         public void Inc()
         {
-
-            string number = "";
-            if (fractionalDigits.Count == 0)
-                number = "1";
-            else
-            {
-                number = "0.";
-                for (int i = 0; i < fractionalDigits.Count - 1; ++i)
-                    number += "0";
-                number += "1";
-            }
-            add(new Number(number, NumeralSystem.Binary, number.Length - 2));
+            Add(Number.One());
         }
-        
+        public void Dec()
+        {
+            Sub(Number.One());
+        }
+
         public void Add(Number n)
         {
             if (negative == n.negative)
@@ -457,7 +460,7 @@ namespace binaryConverter
             n2.sub(this);
             Copy(n2);
         }
-      
+
         public void Sub(Number n)
         {
             if (negative == !n.negative)
@@ -476,6 +479,7 @@ namespace binaryConverter
             }
             sub(n);
         }
+        
 
         private void add(Number n)
         {
@@ -553,7 +557,7 @@ namespace binaryConverter
             subIntegerPart(n);
             if (flag)
             {
-                Sub(new Number("1", NumeralSystem.Binary));
+                Sub(Number.One());
             }
         }
 
@@ -618,7 +622,7 @@ namespace binaryConverter
                     }
                 }
             }
-            
+
             if (flag)
             {
                 negative = true;
@@ -711,197 +715,4 @@ namespace binaryConverter
             return true;
         }
     }
-
-    /*
-    class Number2
-    {
-
-        public Number(int number, byte numeralSystem)
-        {
-            precision = 0;
-            setComponents(number, 0, numeralSystem, 0);
-        }
-
-        public Number(double number, byte numeralSystem, int precision)
-        {
-            this.precision = precision;
-            setDouble(number, numeralSystem, precision);
-        }
-
-        private void setComponents(int number, int fractionalPart, byte numeralSystem, int precision)
-        {
-            digits = new List<byte>();
-            fractionalDigits = new List<byte>();
-            this.precision = precision;
-            setIntegerPart(number, numeralSystem);
-            setFractionalPart(fractionalPart, numeralSystem, precision);
-        }
-
-        private void setDouble(double number, byte numeralSystem, int precision)
-        {
-            // Dividing number into two parts: integer and francional.
-            int integerPart = (int)number;
-            number -= integerPart;
-            int fractionalPart = 0;
-            for (int i = 0; i < precision; ++i)
-            {
-                fractionalPart *= numeralSystem;
-                number *= numeralSystem;
-                fractionalPart += (int)number % numeralSystem;
-                number -= (int)number;
-            }
-
-            setComponents(integerPart, fractionalPart, numeralSystem, precision);
-        }
-
-        private void setIntegerPart(int number, byte numeralSystem)
-        {
-            this.NumeralSystem = numeralSystem;
-            if (number < 0)
-            {
-                negative = true;
-                number = -number;
-            }
-
-            while (number > 0)
-            {
-                digits.Add((byte)(number % numeralSystem));
-                number /= numeralSystem;
-            }
-
-            checkZero();
-        }
-
-        private void setFractionalPart(int fractionalPart, byte numeralSystem, int precision)
-        {
-            for (int i = 0; i < precision; ++i)
-            {
-                fractionalDigits.Add((byte)(fractionalPart % numeralSystem));
-                fractionalPart /= numeralSystem;
-            }
-
-            checkZero();
-        }
-
-
-        public bool isPositive()
-        {
-            return !negative && !zero;
-        }
-
-        public bool isZero()
-        {
-            return zero;
-        }
-
-        public bool isNegative()
-        {
-            return !negative;
-        }
-
-
-        public static string digitToString(int digit, int numeralSystem)
-        {
-            if (digit < 10)
-            {
-                return digit.ToString();
-            }
-            digit -= 10;
-            char c = (char)digit;
-            c += 'A';
-            return "" + c;
-        }
-
-        public override string ToString()
-        {
-            string result = "";
-            for (int i = digits.Count - 1; i >= 0; --i)
-            {
-                result += digitToString(digits[i], NumeralSystem);
-            }
-
-            if (fractionalDigits.Count == 0) return result;
-
-            result += ".";
-            for (int i = fractionalDigits.Count - 1; i >= 0; --i)
-            {
-                result += digitToString(fractionalDigits[i], NumeralSystem);
-            }
-            return result;
-        }
-
-        public void ConvertTo(byte numeralSystem)
-        {
-            int part = 0;
-            List<byte> integers = new List<byte>();
-            List<byte> fractionals = new List<byte>();
-
-            for (int i = digits.Count - 1; i >= 0; --i)
-            {
-                part = part * NumeralSystem + digits[i];
-                int rest = part % numeralSystem;
-                part = part / numeralSystem;
-                if (!(rest == 0 && digits.Count == 0))
-                {
-                    integers.Add((byte)rest);
-                }
-            }
-            digits = integers;
-            NumeralSystem = numeralSystem;
-        }
-
-        public void ConvertToDecimal()
-        {
-            //if (NumeralSystem == 10) return;
-
-            double newNumber = 0;
-            double numPower = 1;
-
-            for (int i = 0; i < digits.Count; ++i)
-            {
-                newNumber += numPower * digits[i];
-                numPower *= NumeralSystem;
-            }
-            numPower = 1;
-            for (int i = fractionalDigits.Count - 1; i >= 0; --i)
-            {
-                numPower /= NumeralSystem;
-                newNumber += numPower * fractionalDigits[i];
-            }
-
-            setDouble(newNumber, 10, precision);
-        }
-
-
-        public byte NumeralSystem;
-
-        private bool negative = false;
-        private bool zero = true;
-        private int precision;
-
-        private List<byte> digits = new List<byte>();
-        private List<byte> fractionalDigits = new List<byte>();
-
-        private void checkZero()
-        {
-            zero = true;
-            for (int i = 0; i < digits.Count; ++i)
-            {
-                if (digits[i] != 0)
-                {
-                    zero = false;
-                    return;
-                }
-            }
-            for (int i = 0; i < fractionalDigits.Count; ++i)
-            {
-                if (digits[i] != 0)
-                {
-                    zero = false;
-                    return;
-                }
-            }
-        }
-
-    }*/
 }
