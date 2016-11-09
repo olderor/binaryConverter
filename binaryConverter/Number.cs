@@ -414,7 +414,6 @@ namespace binaryConverter
             n.Add(n2);
             return n;
         }
-
         public static Number operator -(Number n1, Number n2)
         {
             Number n = new Number(n1);
@@ -426,6 +425,44 @@ namespace binaryConverter
             Number n2 = Number.Zero();
             n2.Sub(n);
             return n2;
+        }
+        public static Number operator <<(Number n, int count)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                bool valueToInsert = false;
+                if (n.fractionalDigits.Count != 0)
+                {
+                    valueToInsert = n.fractionalDigits[0];
+                    n.fractionalDigits.RemoveAt(0);
+                }
+                n.digits.Insert(0, valueToInsert);
+            }
+            return n;
+        }
+        public static Number operator >>(Number n, int count)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                bool valueToInsert = false;
+                if (n.digits.Count != 0)
+                {
+                    valueToInsert = n.digits[0];
+                    n.digits.RemoveAt(0);
+                }
+                n.fractionalDigits.Insert(0, valueToInsert);
+            }
+            if (n.digits.Count == 0)
+            {
+                n.digits.Add(false);
+            }
+            return n;
+        }
+        public static Number operator *(Number n1, Number n2)
+        {
+            Number n = new Number(n1);
+            n.Mul(n2);
+            return n;
         }
 
         public void Invert()
@@ -551,6 +588,43 @@ namespace binaryConverter
         public void Mul(Number n)
         {
             Number result = Number.Zero();
+            Number n1 = getFullNumber();
+            Number n2 = n.getFullNumber();
+
+            for (int i = 0; i < n2.digits.Count; ++i)
+            {
+                if (n2.digits[i])
+                {
+                    result += n1;
+                }
+                n1 <<= 1;
+            }
+            int toMove = fractionalDigits.Count + n.fractionalDigits.Count;
+            result >>= toMove;
+            removeLeadingZeros(ref result.digits);
+            removeLeadingZeros(ref result.fractionalDigits);
+
+            if (result.digits.Count == 0)
+            {
+                result.digits.Add(false);
+            }
+            Copy(result);
+        }
+
+        
+        private Number getFullNumber()
+        {
+            Number n = Number.Zero();
+            n.digits = new List<bool>();
+            for (int i = fractionalDigits.Count - 1; i >= 0; --i)
+            {
+                n.digits.Add(fractionalDigits[i]);
+            }
+            for (int i = 0; i < digits.Count; ++i)
+            {
+                n.digits.Add(digits[i]);
+            }
+            return n;
         }
 
         private void add(Number n)

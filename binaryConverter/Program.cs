@@ -39,6 +39,8 @@ namespace binaryConverter
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine();
+
+
             Console.Write(n);
             Console.WriteLine(" (" + n.ConvertToDecimal() + ")");
             Number n3 = new Number(n);
@@ -46,6 +48,24 @@ namespace binaryConverter
             Console.Write(n2);
             Console.WriteLine(" (" + n2.ConvertToDecimal() + ")");
 
+
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+
+
+
+            n = new Number("12.3", NumeralSystem.Decimal, 10);
+            n2 = new Number("3.2", NumeralSystem.Decimal, 10);
+            Console.Write(n);
+            Console.Write(" (" + n.ConvertToDecimal() + ")");
+            Console.Write(" * ");
+            Console.Write(n2);
+            Console.Write(" (" + n2.ConvertToDecimal() + ")");
+            Console.Write(" = ");
+            n3 = n * n2;
+            Console.Write(n3);
+            Console.Write(" (" + n3.ConvertToDecimal() + ")");
             Console.Read();
 
         }
