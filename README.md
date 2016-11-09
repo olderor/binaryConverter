@@ -3,8 +3,6 @@
 
 *   basic arithmetic operations with two numbers  
 
-*   basic arithmetic operations with two numbers  
-
 *   long arithmetic (almost unlimited numbers)  
 ___
 <img src="http://i.imgur.com/BUzEEO9.png" />
