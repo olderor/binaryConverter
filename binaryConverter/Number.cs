@@ -34,7 +34,7 @@ namespace binaryConverter
 
         public void Copy(Number n)
         {
-            maxPrecision = n.precision;
+            maxPrecision = n.maxPrecision;
             digits = new List<bool>();
             fractionalDigits = new List<bool>();
             negative = n.negative;
@@ -103,7 +103,7 @@ namespace binaryConverter
         {
             if (system == NumeralSystem.Decimal)
             {
-                digits = convertDecimalToBinary(Convert.ToInt32(number));
+                digits = convertDecimalToBinary(number);
             }
             for (int i = number.Length - 1; i >= 0; --i)
             {
@@ -172,41 +172,132 @@ namespace binaryConverter
             return result;
         }
 
-        private List<bool> convertDecimalToBinary(int number)
+
+        private List<int> divideDecimalByTwo(ref List<int> number)
+        {
+            int rest = 0;
+            List<int> result = new List<int>();
+            for (int i = number.Count - 1; i >= 0; --i)
+            {
+                int part = rest * 10 + number[i];
+                int res = part / 2;
+                rest = part % 2;
+                if (result.Count == 0 && res == 0) continue;
+                result.Insert(0, res);
+            }
+            return result;
+        }
+        private List<bool> convertDecimalToBinary(string numberString)
         {
             List<bool> result = new List<bool>();
-            while (number > 0)
+            List<int> number = new List<int>();
+            for (int i = numberString.Length - 1; i >= 0; --i)
             {
-                result.Add(number % 2 == 1);
-                number /= 2;
+                number.Add(numberString[i] - '0');
+            }
+
+            while (number.Count != 0)
+            {
+                result.Add(number[0] % 2 == 1);
+                number = divideDecimalByTwo(ref number);
             }
             return result;
         }
 
+        private List<int> addDecimal(ref List<int> n1, ref List<int> n2)
+        {
+            List<int> result = new List<int>();
+            int minLength = Math.Min(n1.Count, n2.Count);
+            int rest = 0;
+            for (int i = 0; i < minLength; ++i)
+            {
+                rest += n1[i] + n2[i];
+                result.Add(rest % 10);
+                rest /= 10;
+            }
+            for (int i = minLength; i < n1.Count; ++i)
+            {
+                rest += n1[i];
+                result.Add(rest % 10);
+                rest /= 10;
+            }
+            for (int i = minLength; i < n2.Count; ++i)
+            {
+                rest += n2[i];
+                result.Add(rest % 10);
+                rest = rest / 10;
+            }
+            while (rest != 0)
+            {
+                result.Add(rest % 10);
+                rest = rest / 10;
+            }
+            return result;
+        }
         public string ConvertToDecimal()
         {
             string result = negative ? "-" : "";
-            double number = 0;
-            double pow = 1;
+            List<int> number = new List<int>();
+            List<int> pow = new List<int>();
+            pow.Add(1);
             for (int i = 0; i < digits.Count; ++i)
             {
-                number += (digits[i] ? 1 : 0) * pow;
-                pow *= 2;
+                if (digits[i])
+                {
+                    number = addDecimal(ref number, ref pow);
+                }
+                pow = addDecimal(ref pow, ref pow);
             }
-            pow = 1;
+
+            for (int i = number.Count - 1; i >= 0; --i)
+            {
+                result = result + number[i].ToString();
+            }
+
+            if (fractionalDigits.Count != 0)
+                result = result + ".";
+
+            pow = new List<int>();
+            pow.Add(1);
+            number = new List<int>();
+            for (int i = 0; i < fractionalDigits.Count; ++i)
+            {
+                List<int> newPow = new List<int>();
+                for (int j = 0; j < 5; ++j)
+                {
+                    newPow = addDecimal(ref newPow, ref pow);
+                }
+                while (newPow.Count < i + 1)
+                {
+                    newPow.Add(0);
+                }
+                while (number.Count < newPow.Count)
+                {
+                    number.Insert(0, 0);
+                }
+                pow = newPow;
+                if (fractionalDigits[i])
+                    number = addDecimal(ref number, ref pow);
+            }
+            /*pow = 1;
             for (int i = 0; i < fractionalDigits.Count; ++i)
             {
                 pow /= 2;
                 number += (fractionalDigits[i] ? 1 : 0) * pow;
+            }*/
+            for (int i = number.Count - 1; i >= 0; --i)
+            {
+                result = result + number[i].ToString();
             }
-            return result + number.ToString();
+            return result;
         }
 
         public string ConvertTo(NumeralSystem system)
         {
-            string result = "";
-
             if (system == NumeralSystem.Binary) return ToString();
+            if (system == NumeralSystem.Decimal) return ConvertToDecimal();
+
+            string result = "";
 
             int partCount = system == NumeralSystem.Octal ? 3 : 4;
 
@@ -276,7 +367,7 @@ namespace binaryConverter
                     result.Add(digit == 1);
                     return result;
                 case NumeralSystem.Octal:
-                    result = convertDecimalToBinary(digit);
+                    result = convertDecimalToBinary(digit.ToString());
                     while (result.Count < 3)
                     {
                         result.Add(false);
@@ -285,7 +376,7 @@ namespace binaryConverter
                 case NumeralSystem.Hexadecimal:
                     int dig = digit;
                     if (dig > 9) dig = dig + '0' - 'A' + 10;
-                    result = convertDecimalToBinary(dig);
+                    result = convertDecimalToBinary(dig.ToString());
                     while (result.Count < 4)
                     {
                         result.Add(false);
@@ -595,6 +686,7 @@ namespace binaryConverter
         {
             if (n.isZero())
             {
+                Console.WriteLine("Warning, division by zero found.");
                 return;
             }
 
@@ -686,7 +778,7 @@ namespace binaryConverter
             negative = false;
         }
 
-        
+
         private Number getFullNumber()
         {
             Number n = Number.Zero();
