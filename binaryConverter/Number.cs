@@ -421,6 +421,12 @@ namespace binaryConverter
             n.Sub(n2);
             return n;
         }
+        public static Number operator -(Number n)
+        {
+            Number n2 = Number.Zero();
+            n2.Sub(n);
+            return n2;
+        }
 
         public void Invert()
         {
@@ -529,6 +535,17 @@ namespace binaryConverter
             {
                 DecreaseLastBit();
             }
+        }
+
+        public static Number Abs(Number n)
+        {
+            Number n2 = new Number(n);
+            n2.negative = false;
+            return n2;
+        }
+        public void Abs()
+        {
+            negative = false;
         }
 
         public void Mul(Number n)
