@@ -434,13 +434,42 @@ namespace binaryConverter
             }
         }
 
-        public void Inc()
+        public void Increase()
         {
             Add(Number.One());
         }
-        public void Dec()
+        public void IncreaseLastBit()
+        {
+            string number = "";
+            if (fractionalDigits.Count == 0)
+                number = "1";
+            else
+            {
+                number = "0.";
+                for (int i = 0; i < fractionalDigits.Count - 1; ++i)
+                    number += "0";
+                number += "1";
+            }
+            Add(new Number(number, NumeralSystem.Binary, number.Length - 2));
+        }
+
+        public void Decrease()
         {
             Sub(Number.One());
+        }
+        public void DecreaseLastBit()
+        {
+            string number = "";
+            if (fractionalDigits.Count == 0)
+                number = "1";
+            else
+            {
+                number = "0.";
+                for (int i = 0; i < fractionalDigits.Count - 1; ++i)
+                    number += "0";
+                number += "1";
+            }
+            Sub(new Number(number, NumeralSystem.Binary, number.Length - 2));
         }
 
         public void Add(Number n)
@@ -484,9 +513,10 @@ namespace binaryConverter
 
         public void Floor(int digits = 0)
         {
-            if (negative && fractionalDigits.Count != 0)
+            bool needDecrease = false;
+            if (negative && digits < fractionalDigits.Count)
             {
-                Sub(Number.One());
+                needDecrease = true;
             }
             List<bool> newFractionalDigits = new List<bool>();
             for (int i = 0; i < digits && i < fractionalDigits.Count; ++i)
@@ -495,6 +525,10 @@ namespace binaryConverter
             }
             fractionalDigits = newFractionalDigits;
             removeLeadingZeros(ref fractionalDigits);
+            if (needDecrease)
+            {
+                DecreaseLastBit();
+            }
         }
 
         public void Mul(Number n)

@@ -16,8 +16,8 @@ namespace binaryConverter
 
             Console.WriteLine("integers:");
 
-            Number n = new Number("-3", NumeralSystem.Decimal);
-            Number n2 = new Number("-2", NumeralSystem.Decimal);
+            Number n = new Number("-3.123", NumeralSystem.Decimal, 100);
+            Number n2 = new Number("-2.321", NumeralSystem.Decimal, 100);
             Console.Write(n);
             Console.Write(" (" + n.ConvertToDecimal() + ")");
             Console.Write(" - ");
@@ -28,9 +28,11 @@ namespace binaryConverter
             Console.Write(n);
             Console.WriteLine(" (" + n.ConvertToDecimal() + ")");
             n.Floor(7);
-            Console.WriteLine(n);
+            Console.Write(n);
+            Console.WriteLine(" (" + n.ConvertToDecimal() + ")");
             n.Floor();
-            Console.WriteLine(n);
+            Console.Write(n);
+            Console.WriteLine(" (" + n.ConvertToDecimal() + ")");
             Console.Read();
         }
     }
