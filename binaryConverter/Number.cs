@@ -52,11 +52,11 @@ namespace binaryConverter
             string integerPart = "";
             double fractionalPart = 0;
             int i = 0;
-
+            bool neg = false;
             if (number[0] == '-')
             {
                 ++i;
-                negative = true;
+                neg = true;
             }
 
             for (; i < number.Length; ++i)
@@ -85,12 +85,13 @@ namespace binaryConverter
             setInteger(integerPart, system);
             setFractional(fractionalPart, precision);
 
-            if (negative)
+            if (neg)
             {
                 Number n2 = Number.Zero();
                 n2.Sub(this);
                 Copy(n2);
             }
+            negative = neg;
         }
 
 
@@ -479,7 +480,27 @@ namespace binaryConverter
             }
             sub(n);
         }
-        
+
+
+        public void Floor(int digits = 0)
+        {
+            if (negative && fractionalDigits.Count != 0)
+            {
+                Sub(Number.One());
+            }
+            List<bool> newFractionalDigits = new List<bool>();
+            for (int i = 0; i < digits && i < fractionalDigits.Count; ++i)
+            {
+                newFractionalDigits.Add(fractionalDigits[i]);
+            }
+            fractionalDigits = newFractionalDigits;
+            removeLeadingZeros(ref fractionalDigits);
+        }
+
+        public void Mul(Number n)
+        {
+            Number result = Number.Zero();
+        }
 
         private void add(Number n)
         {

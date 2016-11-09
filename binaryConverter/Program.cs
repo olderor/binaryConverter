@@ -16,8 +16,8 @@ namespace binaryConverter
 
             Console.WriteLine("integers:");
 
-            Number n = new Number("55597", NumeralSystem.Decimal, 10);
-            Number n2 = new Number("11", NumeralSystem.Decimal, 10);
+            Number n = new Number("-3", NumeralSystem.Decimal);
+            Number n2 = new Number("-2", NumeralSystem.Decimal);
             Console.Write(n);
             Console.Write(" (" + n.ConvertToDecimal() + ")");
             Console.Write(" - ");
@@ -26,7 +26,11 @@ namespace binaryConverter
             Console.Write(" = ");
             n += n2;
             Console.Write(n);
-            Console.Write(" (" + n.ConvertToDecimal() + ")");
+            Console.WriteLine(" (" + n.ConvertToDecimal() + ")");
+            n.Floor(7);
+            Console.WriteLine(n);
+            n.Floor();
+            Console.WriteLine(n);
             Console.Read();
         }
     }
