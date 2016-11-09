@@ -132,14 +132,14 @@ namespace binaryConverter
         public string ConvertTo(NumeralSystem system)
         {
             string result = "";
-            
+
             if (system == NumeralSystem.Binary) return ToString();
 
             int partCount = system == NumeralSystem.Octal ? 3 : 4;
 
             int digit = 0;
             int pow = 1;
-            for (int i = 0; i < digits.Count; )
+            for (int i = 0; i < digits.Count;)
             {
                 digit = 0;
                 pow = 1;
@@ -250,7 +250,7 @@ namespace binaryConverter
 
         public void Inc()
         {
-            
+
             string number = "";
             if (fractionalDigits.Count == 0)
                 number = "1";
@@ -297,7 +297,7 @@ namespace binaryConverter
             int maxLength = length1 + length2 - minLength;
 
             int i = 0;
-            for (i = length1; i <= maxLength + 1; ++i)
+            for (i = length1; i < maxLength; ++i)
                 digits.Add(false);
 
             i = 0;
@@ -307,19 +307,22 @@ namespace binaryConverter
                 digits[i] = rest % 2 == 1;
                 rest /= 2;
             }
-            if (rest == 1 && negative)
+
+            while (rest != 0)
             {
-                negative = false;
-            }
-            else
-            {
-                while (rest != 0)
+                if (i == digits.Count)
                 {
-                    rest += (digits[i] ? 1 : 0);
-                    digits[i] = rest % 2 == 1;
-                    rest /= 2;
-                    ++i;
+                    if ((negative && !n.negative) || (!negative && n.negative))
+                    {
+                        negative = false;
+                        break;
+                    }
+                    digits.Add(true);
                 }
+                rest += (digits[i] ? 1 : 0);
+                digits[i] = rest % 2 == 1;
+                rest /= 2;
+                ++i;
             }
             removeLeadingZeros(ref digits);
             if (digits.Count == 0)

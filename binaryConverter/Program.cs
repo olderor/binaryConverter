@@ -16,13 +16,14 @@ namespace binaryConverter
 
             Console.WriteLine("integers:");
 
-            Number n = new Number("0.7245", NumeralSystem.Decimal, 110);
+            Number n = new Number("245", NumeralSystem.Decimal);
+            Number n2 = new Number("-245", NumeralSystem.Decimal);
+            Console.Write(n);
+            Console.Write(" + ");
+            Console.Write(n2);
+            Console.Write(" = ");
+            n.Add(n2);
             Console.WriteLine(n);
-            Console.WriteLine(n.ConvertToDecimal());
-            Console.WriteLine(n.ConvertTo(NumeralSystem.Binary));
-            Console.WriteLine(n.ConvertTo(NumeralSystem.Octal));
-            Console.WriteLine(n.ConvertTo(NumeralSystem.Hexadecimal));
-
             Console.Read();
         }
     }
